@@ -119,6 +119,7 @@
             border-radius: 20px;
             margin: 5px;
             font-size: 14px;
+            cursor: pointer;
         }
 
         .emotion-badge.active {
@@ -207,9 +208,32 @@
         <div class="register-link">
             Don't have an account? <a href="/register">Register here</a>
         </div>
-
-
     </div>
+
+    <script>
+
+        let selectedEmotion = 'happy';
+        const video = document.getElementById('video');
+        const usernameInput = document.getElementById('username');
+        const currentEmotionDiv = document.getElementById('currentEmotion');
+
+
+
+
+        //Emotion badge selection
+        document.querySelectorAll('.emotion-badge').forEach(badge => {
+            badge.addEventListener('click', function() {
+                document.querySelectorAll('.emotion-badge').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedEmotion = this.getAttribute('data-emotion');
+            });
+        });
+
+
+
+        
+        
+    </script>
     
 </body>
 </html>
