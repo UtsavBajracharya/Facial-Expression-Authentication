@@ -3,10 +3,10 @@ import cv2
 import numpy as np
 from deepface import DeepFace
 from datetime import datetime
-import secrets
+# import secrets
 
 app = Flask(__name__)
-app.secret.key = secrets.token_hex(16) # Genrate secure secret key
+# app.secret.key = secrets.token_hex(16) # Generate secure secret key
 
 
 # Homepage - Login
@@ -18,4 +18,4 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)
