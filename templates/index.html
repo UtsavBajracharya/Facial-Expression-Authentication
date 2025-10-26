@@ -216,11 +216,11 @@
         const video = document.getElementById('video');
         const usernameInput = document.getElementById('username');
         const currentEmotionDiv = document.getElementById('currentEmotion');
+        const startCameraBtn = document.getElementById('startCamera');
 
 
 
-
-        //Emotion badge selection
+        // Emotion badge selection
         document.querySelectorAll('.emotion-badge').forEach(badge => {
             badge.addEventListener('click', function() {
                 document.querySelectorAll('.emotion-badge').forEach(b => b.classList.remove('active'));
@@ -229,9 +229,25 @@
             });
         });
 
-
+        // Start camera
+        startCameraBtn.addEventListener('click', async function() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia( {
+                   video: { width: 640, height: 400 } 
+                });
+                video.srcObject = stream;
+                showMessage('Camera started successfully!', 'success');
+                
+                // start emotion detection loop
+                detectEmotionLoop();
+            } catch (error) {
+                showMessage('Error accessing camera: ' + error.message, 'error');
+            }
+        });
 
         
+        
+
         
     </script>
     
