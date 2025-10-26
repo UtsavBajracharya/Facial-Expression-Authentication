@@ -10,12 +10,28 @@
         <h1>Facial Expression Login</h1>
         <p class="subtiltle">Authenticate with your face and Expression</p>
     
-    <div id="message" class="message hidden"></div>
+        <div id="message" class="message hidden"></div>
 
-    <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" placeholder="Enter your username" required>
-    </div>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter your username" required>
+        </div>
+
+        <div class="form-group">
+            <label>Required Expression</label>
+            <div id="emotionBadges">
+                <span class="emotion-badge active" data-emotion="happy"> Happy</span>
+                <span class="emotion-badge" data-emotion="surprise"> Surprise</span>
+                <span class="emotion-badge" data-emotion="neutral"> Neutral</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Camera Feed</label>
+            <video id="video" autoplay playsinline></video>
+            <div id="currentEmotion">Detecting emotion...</div>
+        </div>
+
 
     </div>
     
