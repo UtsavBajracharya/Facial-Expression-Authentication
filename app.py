@@ -30,8 +30,18 @@ def decode_base64_image(base64_string):
     except Exception as e:
         print(f"Error decoding image: {e}")
         return None
-    
-    
+ 
+# Save user face
+def save_user_face(username, image):
+    user_dir = os.path.join(USER_DATA_DIR, username)
+    if not os.path.exists(user_dir):
+          os.makedirs(user_dir)
+
+    face_path = os.path.join(user_dir, 'reference_face.jpg')
+    cv2.imwrite(face_path, image)
+    return face_path
+
+
 # Save user information    
 def save_user_info(username, email):
     user_file = os.path.join(USER_DATA_DIR, username, 'info.json')
