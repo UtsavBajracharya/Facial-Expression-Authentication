@@ -30,6 +30,25 @@ def decode_base64_image(base64_string):
     except Exception as e:
         print(f"Error decoding image: {e}")
         return None
+
+# Detect facial emotion from image
+
+def detect_emotion(image):
+    try:
+        result = DeepFace.analyze(image, actions=['emotion'], enforce_detection=False)
+
+        # Hangle both list and dict results
+        if isinstance(result, list):
+            result=result[0]
+        
+        dominant_emotion = result['dominant_emotion']
+        return dominant_emotion
+    
+    except Exception as e:
+        print(f'Error detecting emotion: {e}')
+        return None
+    
+
  
 # Save user face
 def save_user_face(username, image):
