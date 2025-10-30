@@ -10,6 +10,9 @@ from datetime import datetime
 app = Flask(__name__)
 # app.secret.key = secrets.token_hex(16) # Generate secure secret key
 
+# Emotion mapping for authentication
+REQUIRED_EXPRESSIONS = ['happy', 'surprise', 'neutral']
+
 # Configuration
 USER_DATA_DIR = 'user_data'
 if not os.path.exists(USER_DATA_DIR):
