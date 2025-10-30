@@ -75,8 +75,31 @@ def save_user_info(username, email):
     with open(user_file, 'W') as f:
         json.dump(user_info, f)
 
+        
+# Verify if the face matches stored reference
+def verify_face(username, image):
+    user_dir = os.path.join(USER_DATA_DIR, username)
+    reference_path = os.path.join(user_dir, 'reference_face.jpg')
 
+    if not os.path.exists(reference_path):
+        return False
+    
+    try:
+        # Save temporary image
+        temp_path = os.path.join(user_dir, 'temp_verify.jpg')
+        cv2.imwrite(temp_path, image)
 
+        # Verify faces
+        result = DeepFace.verify(temp_path, reference_path, enforce_detection=False)
+
+        # Clean up temp file
+        os.remove(temp_path)
+
+        return result['verified']
+    except Exception as e:
+        print(f"Error verifyling face: {e}")
+        return False
+    
 
 # Validate if the user already exists 
 def user_exists(username):
