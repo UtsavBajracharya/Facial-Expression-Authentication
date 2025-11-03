@@ -149,6 +149,51 @@ def api_register():
     except Exception as e:
         return jsonify({'success': False, 'message': f'Registration error: {str(e)}'})
     
+# Authenticate the user with facial expression
+@app.route('/api/authenticate', method=['POST'])
+def api_authenticate():
+    try:
+        data = request.json
+        username = data.get('username')
+        image_data = data.get('image')
+        required_emotion = data.get('emotion')
+
+        if not username or not image_data or not required_emotion:
+            return jsonify({'success': False, 'message': 'Missing required fields'})
+        
+        if not user_exists(username):
+            return jsonify({'success': False, 'message': 'User not found'})
+        
+        # Decode image
+        image = decode_base64_image(image_data)
+        if image is None:
+            return jsonify({'success': False, 'message': 'Invalid image data'})
+        
+        # Verify face matches stored reference
+        face_verified = verify_face(username, image)
+        if not face_verified:
+            return jsonify({'success': False, 'message': 'Face verification failed'})
+        
+
+        # Detect emotion
+        detected_emotion = detect_emotion(image)
+        if detected_emotion is None:
+            return jsonify({'success': False, 'message': 'Could not detect facial expression'})
+        
+        # Check if emotion matches
+        if detected_emotion.lower() == required_emotion.lower():
+            session['username'] = username
+            return jsonify({
+                'success' : True,
+                'message' : 'Authentication successful!',
+                'emotion' : detected_emotion
+            
+            })
+    
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Authentication error: {str(e)}'})
+
+    
 
 @app.route('/api/detect_emotion', methods=['POST'])
 def api_detect_emotion():
