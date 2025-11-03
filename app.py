@@ -9,7 +9,7 @@ from datetime import datetime
 import secrets
 
 app = Flask(__name__)
-app.secret.key = secrets.token_hex(16) # Generate secure secret key
+app.secret_key = secrets.token_hex(16) # Generate secure secret key
 
 # Configuration
 USER_DATA_DIR = 'user_data'
@@ -150,7 +150,7 @@ def api_register():
         return jsonify({'success': False, 'message': f'Registration error: {str(e)}'})
     
 # Authenticate the user with facial expression
-@app.route('/api/authenticate', method=['POST'])
+@app.route('/api/authenticate', methods=['POST'])
 def api_authenticate():
     try:
         data = request.json
