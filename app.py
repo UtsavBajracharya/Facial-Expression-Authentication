@@ -3,21 +3,21 @@ import cv2
 import numpy as np
 import base64
 import os
+import json
 from deepface import DeepFace
 from datetime import datetime
-# import secrets
+import secrets
 
 app = Flask(__name__)
-# app.secret.key = secrets.token_hex(16) # Generate secure secret key
-
-# Emotion mapping for authentication
-REQUIRED_EXPRESSIONS = ['happy', 'surprise', 'neutral']
+app.secret.key = secrets.token_hex(16) # Generate secure secret key
 
 # Configuration
 USER_DATA_DIR = 'user_data'
 if not os.path.exists(USER_DATA_DIR):
     os.makedirs(USER_DATA_DIR)
 
+# Emotion mapping for authentication
+REQUIRED_EXPRESSIONS = ['happy', 'surprise', 'neutral']
 
 # Convert base64 string to OpenCV image
 def decode_base64_image(base64_string):
