@@ -148,6 +148,11 @@ def api_register():
     
     except Exception as e:
         return jsonify({'success': False, 'message': f'Registration error: {str(e)}'})
+    
+
+@app.route('/api/detect_emotion', methods=['POST'])
+def api_detect_emotion():
+    return jsonify({'success': False, 'message': str(e)})
         
 
 if __name__ == '__main__':
