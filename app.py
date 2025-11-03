@@ -187,14 +187,18 @@ def api_authenticate():
                 'success' : True,
                 'message' : 'Authentication successful!',
                 'emotion' : detected_emotion
-            
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': f'Wrong expression. Expected: {required_emotion}, Got: {detected_emotion}' ,
+                'detected_emotion': detected_emotion
             })
     
     except Exception as e:
         return jsonify({'success': False, 'message': f'Authentication error: {str(e)}'})
 
     
-
 @app.route('/api/detect_emotion', methods=['POST'])
 def api_detect_emotion():
     return jsonify({'success': False, 'message': str(e)})
