@@ -212,11 +212,13 @@
 
     <script>
 
+        let stream = null;
         let selectedEmotion = 'happy';
         const video = document.getElementById('video');
         const usernameInput = document.getElementById('username');
         const currentEmotionDiv = document.getElementById('currentEmotion');
         const startCameraBtn = document.getElementById('startCamera');
+        const currentEmotion = document.getElementById('currentEmotion');
 
 
 
@@ -244,6 +246,42 @@
                 showMessage('Error accessing camera: ' + error.message, 'error');
             }
         });
+
+        // Detect real time emotion
+
+        async function detectEmotionLoop() {
+            if (!stream) return;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.ghetContext('2d');
+
+            setInterval(async () => {
+                if (!stream) return;
+
+                ctx.drawImage(video, 0, 0);
+                const imageData = canvas.toDataURL('image/jpeg');
+
+                try {
+                    const reponse = await fetch('/api/detect_emotion', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json'},
+                        body: JSON.stringify({ image: imageData })
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        currentEmotionDiv.textContent = `Current emotion: ${result.emotion}` ;
+
+                    }
+                } catch (error) {
+                    console.error('Error detecting emotion:' , error);
+                }
+
+            }, 2000);
+            
+        }
 
         
         
