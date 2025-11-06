@@ -298,9 +298,37 @@
 
             // Capture image from the video
             const canvas = document.createElement('canvas');
+            canvas.width =video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            const imageData = canvas.toDataURL('image/jpeg');
 
-            
-        })
+            try {
+                const reponse = await fetch('/api/authenticate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: username,
+                        image: imageData,
+                        emotion: selectedEmotion
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage(result.message, 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1500); 
+                } else {
+                    showMessage(result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Authentication error: ' + error.message, 'error');
+            } 
+        });
 
 
         function showMessage(text, type) {
