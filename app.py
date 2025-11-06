@@ -198,10 +198,28 @@ def api_authenticate():
     except Exception as e:
         return jsonify({'success': False, 'message': f'Authentication error: {str(e)}'})
 
-    
+# Detect emotion from the image    
 @app.route('/api/detect_emotion', methods=['POST'])
 def api_detect_emotion():
-    return jsonify({'success': False, 'message': str(e)})
+    try:
+        data = request.json
+        image_data = data.get('image')
+
+        if not image_data:
+            return jsonify({'success': False, 'message': 'No image provided'})
+        
+        image = decode_base64_image(image_data)
+        if image is None:
+            return jsonify({'success': False, 'message': 'Ivalid image data'})
+        
+        emotion =detect_emotion(image)
+        if emotion:
+            return jsonify({'success': True, 'emotion': emotion})
+        else:
+            return jsonify({'success': False, 'message': 'No face detected'})
+         
+    except Exception as e:    
+        return jsonify({'success': False, 'message': str(e)})
         
 
 if __name__ == '__main__':
