@@ -212,7 +212,7 @@ def api_detect_emotion():
         if image is None:
             return jsonify({'success': False, 'message': 'Ivalid image data'})
         
-        emotion =detect_emotion(image)
+        emotion = detect_emotion(image)
         if emotion:
             return jsonify({'success': True, 'emotion': emotion})
         else:

@@ -219,6 +219,7 @@
         const startCameraBtn = document.getElementById('startCamera');
         const currentEmotionDiv = document.getElementById('currentEmotion');
         const messageDiv = document.getElementById('message');
+        const authentication = document.getElementById('authenticate')
 
 
         // Emotion badge selection
@@ -247,7 +248,6 @@
         });
 
         // Detect real time emotion
-
         async function detectEmotionLoop() {
             if (!stream) return;
 
@@ -281,6 +281,27 @@
             }, 2000);
             
         }
+
+        // Authenticate
+        authenticateBtn.addEventListener('click', async function () {
+            const username = usernameInput.value.trim();
+
+            if (!username) {
+                showMessage('Please enter your username', 'error');
+                return;
+            }
+
+            if(!stream) {
+                showMessage('Please start the camera first', 'error');
+                return;
+            }
+
+            // Capture image from the video
+            const canvas = document.createElement('canvas');
+
+            
+        })
+
 
         function showMessage(text, type) {
             messageDiv.textContent = text;
