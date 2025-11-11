@@ -99,6 +99,16 @@ def verify_face(username, image):
     except Exception as e:
         print(f"Error verifyling face: {e}")
         return False
+
+def save_user_info(username, email):
+    user_file = os.path.join(USER_DATA_DIR, username, 'info.json')
+    user_info = {
+        'username': username,
+        'email': email,
+        'registered_at': datetime.now().isoformat()
+    }
+    with open(user_file, 'w') as f:
+        json.dump(user_info, f)
     
 
 # Validate if the user already exists 
