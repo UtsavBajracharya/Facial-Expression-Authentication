@@ -214,12 +214,15 @@
 
         let stream = null;
         let selectedEmotion = 'happy';
+        let videoReady = false;
+        let emotionDetectionInterval = null;
+
         const video = document.getElementById('video');
         const usernameInput = document.getElementById('username');
         const startCameraBtn = document.getElementById('startCamera');
+        const authentication = document.getElementById('authenticate')
         const currentEmotionDiv = document.getElementById('currentEmotion');
         const messageDiv = document.getElementById('message');
-        const authentication = document.getElementById('authenticate')
 
 
         // Emotion badge selection
@@ -228,62 +231,120 @@
                 document.querySelectorAll('.emotion-badge').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 selectedEmotion = this.getAttribute('data-emotion');
+                console.log('Selected emotion:', selectedEmotion);
+
             });
         });
 
         // Start camera
         startCameraBtn.addEventListener('click', async function() {
             try {
+                console.log('Starting camera...');
+                startCameraBtn.disabled = true;
+                startCameraBtn.textContent = 'Starting...';
+
                 stream = await navigator.mediaDevices.getUserMedia( {
                    video: { width: 640, height: 400 } 
                 });
-                video.srcObject = stream;
-                showMessage('Camera started successfully!', 'success');
                 
-                // start emotion detection loop
-                detectEmotionLoop();
+                console.log('Camera stream obtained');
+                video.srcObject = stream;
+                
+                // Wait for video metadata to load
+                await new Promise((resolve) => {
+                    video.onloadedmetadata = () => {
+                        video.play();
+                        resolve();
+                    };
+                });
+                
+                // Give extra time for video to stabilize
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                console.log('Video ready:', video.videoWidth, 'x', video.videoHeight);
+                
+                if (video.videoWidth > 0 && video.videoHeight > 0) {
+                    videoReady = true;
+                    authenticateBtn.disabled = false;
+                    startCameraBtn.textContent = 'Camera Active ✓';
+                    showMessage('Camera started! Make your expression and authenticate', 'success');
+                    
+                    // Start emotion detection loop
+                    detectEmotionLoop();
+                } else {
+                    throw new Error('Video dimensions are 0');
+                }
+                
             } catch (error) {
+                console.error('Camera error:', error);
+                startCameraBtn.disabled = false;
+                startCameraBtn.textContent = 'Start Camera';
                 showMessage('Error accessing camera: ' + error.message, 'error');
             }
         });
 
         // Detect real time emotion
-        async function detectEmotionLoop() {
-            if (!stream) return;
-
+               // Real-time emotion detection
+        function detectEmotionLoop() {
+            if (!stream || !videoReady) return;
+            
+            currentEmotionDiv.textContent = 'Detecting emotions...';
+            
             const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.ghetContext('2d');
-
-            setInterval(async () => {
-                if (!stream) return;
-
-                ctx.drawImage(video, 0, 0);
-                const imageData = canvas.toDataURL('image/jpeg');
-
+            
+            // Clear any existing interval
+            if (emotionDetectionInterval) {
+                clearInterval(emotionDetectionInterval);
+            }
+            
+            emotionDetectionInterval = setInterval(async () => {
+                if (!stream || !videoReady) {
+                    clearInterval(emotionDetectionInterval);
+                    return;
+                }
+                
                 try {
-                    const reponse = await fetch('/api/detect_emotion', {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0);
+                    const imageData = canvas.toDataURL('image/png', 0.8);
+                    
+                    const response = await fetch('/api/detect_emotion', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json'},
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ image: imageData })
                     });
-
+                    
                     const result = await response.json();
                     if (result.success) {
-                        currentEmotionDiv.textContent = `Current emotion: ${result.emotion}` ;
-
+                        currentEmotionDiv.textContent = `Current: ${result.emotion} ${getEmotionEmoji(result.emotion)}`;
+                    } else {
+                        currentEmotionDiv.textContent = 'No face detected';
                     }
                 } catch (error) {
-                    console.error('Error detecting emotion:' , error);
+                    console.error('Emotion detection error:', error);
                 }
+            }, 3000); // Check every 3 seconds
+        }
 
-            }, 2000);
-            
+        // Get emoji for emotion
+        function getEmotionEmoji(emotion) {
+            const emojiMap = {
+                'happy': '😊',
+                'sad': '😢',
+                'angry': '😠',
+                'surprise': '😮',
+                'fear': '😨',
+                'disgust': '🤢',
+                'neutral': '😐'
+            };
+            return emojiMap[emotion] || '😐';
         }
 
         // Authenticate
-        authenticateBtn.addEventListener('click', async function () {
+        authenticateBtn.addEventListener('click', async function() {
+            console.log('Authenticate clicked');
             const username = usernameInput.value.trim();
 
             if (!username) {
@@ -291,21 +352,34 @@
                 return;
             }
 
-            if(!stream) {
+            if (!stream || !videoReady) {
                 showMessage('Please start the camera first', 'error');
                 return;
             }
 
-            // Capture image from the video
-            const canvas = document.createElement('canvas');
-            canvas.width =video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0);
-            const imageData = canvas.toDataURL('image/jpeg');
+            if (video.videoWidth === 0 || video.videoHeight === 0) {
+                showMessage('Video not ready yet, please wait', 'error');
+                return;
+            }
 
             try {
-                const reponse = await fetch('/api/authenticate', {
+                authenticateBtn.disabled = true;
+                authenticateBtn.textContent = 'Authenticating...';
+                
+                console.log('Capturing image for authentication...');
+                console.log('Required emotion:', selectedEmotion);
+
+                // Capture image from video
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0);
+                const imageData = canvas.toDataURL('image/png');
+
+                console.log('Sending authentication request...');
+
+                const response = await fetch('/api/authenticate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -316,31 +390,56 @@
                 });
 
                 const result = await response.json();
+                console.log('Authentication result:', result);
 
                 if (result.success) {
-                    showMessage(result.message, 'success');
+                    showMessage('✓ ' + result.message, 'success');
+                    
+                    // Stop camera
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+                    if (emotionDetectionInterval) {
+                        clearInterval(emotionDetectionInterval);
+                    }
+                    
+                    // Redirect to dashboard
                     setTimeout(() => {
                         window.location.href = '/dashboard';
-                    }, 1500); 
+                    }, 1500);
                 } else {
-                    showMessage(result.message, 'error');
+                    showMessage('✗ ' + result.message, 'error');
+                    authenticateBtn.disabled = false;
+                    authenticateBtn.textContent = 'Authenticate';
                 }
             } catch (error) {
+                console.error('Authentication error:', error);
                 showMessage('Authentication error: ' + error.message, 'error');
-            } 
+                authenticateBtn.disabled = false;
+                authenticateBtn.textContent = 'Authenticate';
+            }
         });
-
 
         function showMessage(text, type) {
             messageDiv.textContent = text;
             messageDiv.className = `message ${type}`;
-            messageDiv.classList.remove('hidden');
-
-            setTimeout(() =>  {
-                messageDiv.classList.add('hidden');
-            }, 5000);
+            
+            if (type === 'error') {
+                setTimeout(() => {
+                    messageDiv.classList.add('hidden');
+                }, 5000);
+            }
         }
 
+        // Clean up on page leave
+        window.onbeforeunload = function() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            if (emotionDetectionInterval) {
+                clearInterval(emotionDetectionInterval);
+            }
+        };
         
         
 
