@@ -221,97 +221,161 @@
             Already have an account? <a href="/">Login here</a>
         </div>
 
-        <script>
+    <script>
 
         let stream = null;
+        let videoReady = false;
+
         const video = document.getElementById('video');
-        const usernameInput = document.getElementById('username');    
+        const usernameInput = document.getElementById('username');
         const emailInput = document.getElementById('email');
         const startCameraBtn = document.getElementById('startCamera');
         const registerBtn = document.getElementById('register');
-        const messageDiv =  document.getElementById('message');
+        const messageDiv = document.getElementById('message');
 
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+        }
 
-        // Start camera
-        startCameraBtn.addEventListener('click', async function() {
+        function hideMessage() {
+            messageDiv.className = 'message hidden';
+        }
+
+        startCameraBtn.onclick = async function() {
             try {
-                stream = await navigator.mediaDevices.getUserMedia( {
-                   video: { width: 640, height: 400 } 
-                });
-                video.srcObject = stream;
-                showMessage('Camera started successfully!', 'success');
+                console.log('Starting camera...');
+                startCameraBtn.disabled = true;
+                startCameraBtn.textContent = 'Starting...';
                 
-                // start emotion detection loop
-                detectEmotionLoop();
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { width: 640, height: 480, facingMode: 'user' } 
+                });
+                
+                console.log('Camera stream obtained');
+                video.srcObject = stream;
+                
+// Wait for video to actually load
+                await new Promise((resolve) => {
+                    video.onloadedmetadata = () => {
+                        video.play();
+                        resolve();
+                    };
+                });
+                
+                // Give extra time for video to stabilize
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                console.log('Video ready:', video.videoWidth, 'x', video.videoHeight);
+                
+                if (video.videoWidth > 0 && video.videoHeight > 0) {
+                    videoReady = true;
+                    registerBtn.disabled = false;
+                    startCameraBtn.textContent = 'Camera Active ✓';
+                    showMessage('Camera ready! You can now register', 'success');
+                } else {
+                    throw new Error('Video dimensions are 0');
+                }
+                
             } catch (error) {
-                showMessage('Error accessing camera: ' + error.message, 'error');
+                console.error('Camera error:', error);
+                startCameraBtn.disabled = false;
+                startCameraBtn.textContent = 'Start Camera';
+                showMessage('Camera error: ' + error.message, 'error');
             }
-        });     
+        };
 
-        // Register
-        registerBtn.addEventListener('click', async function () {
+        registerBtn.onclick = async function() {
+            console.log('Register clicked');
+            
             const username = usernameInput.value.trim();
             const email = emailInput.value.trim();
-
-            if(!username || !email) {
+            
+            if (!username || !email) {
                 showMessage('Please fill in all fields', 'error');
                 return;
             }
-
-            if(!stream) {
-                showMessage('Please start the camera', 'error');
+            
+            if (!videoReady) {
+                showMessage('Please start camera first', 'error');
                 return;
             }
-
-            // Capture image from video
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0);
-            const imageData = canvas.toDataURL('image/jpeg');
-
-            try{
+            
+            if (video.videoWidth === 0 || video.videoHeight === 0) {
+                showMessage('Video not ready yet, please wait', 'error');
+                return;
+            }
+            
+            try {
                 registerBtn.disabled = true;
+                registerBtn.textContent = 'Capturing...';
+                
+                console.log('Capturing image from video...');
+                console.log('Video dimensions:', video.videoWidth, 'x', video.videoHeight);
+                
+                // Create canvas and capture frame
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // Convert to base64 - try PNG first as it's more reliable
+                let imageData = canvas.toDataURL('image/png');
+                
+                console.log('Image captured, data length:', imageData.length);
+                console.log('Image data prefix:', imageData.substring(0, 50));
+                
+                if (!imageData || imageData.length < 1000) {
+                    throw new Error('Failed to capture image - data too small');
+                }
+                
                 registerBtn.textContent = 'Registering...';
-
+                
+                console.log('Sending registration request...');
                 const response = await fetch('/api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        username:username,
-                        email:email,
-                        image: imageData
+                    body: JSON.stringify({ 
+                        username: username, 
+                        email: email, 
+                        image: imageData 
                     })
                 });
-
+                
                 const result = await response.json();
-
-                if(result.success) {
-                    showMessage(result.message + ' Redirecting to login...', 'success');
+                console.log('Registration result:', result);
+                
+                if (result.success) {
+                    showMessage(result.message + ' Redirecting...', 'success');
+                    if (stream) {
+                        stream.getTracks().forEach(t => t.stop());
+                    }
                     setTimeout(() => {
                         window.location.href = '/';
                     }, 2000);
                 } else {
                     showMessage(result.message, 'error');
                     registerBtn.disabled = false;
-                    registerBtn.textContent = 'Register'; 
+                    registerBtn.textContent = 'Register';
                 }
             } catch (error) {
-                showMessage('Registration error: ' + error.message, 'error');
+                console.error('Registration error:', error);
+                showMessage('Error: ' + error.message, 'error');
                 registerBtn.disabled = false;
                 registerBtn.textContent = 'Register';
             }
-        });
+        };
 
-        function showMessage(text, type) {
-            messageDiv.textContent = text;
-            messageDiv.className = `message ${type}`;
-            messageDiv.classList.remove('hidden');
-        }
+        window.onbeforeunload = function() {
+            if (stream) {
+                stream.getTracks().forEach(t => t.stop());
+            }
+        };
 
 
-        </script>
+    </script>
 
     </div>
 </body>
