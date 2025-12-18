@@ -224,14 +224,14 @@
         const currentEmotionDiv = document.getElementById('currentEmotion');
         const messageDiv = document.getElementById('message');
 
-        console.log('DOM elements loaded:', {                      // ✅ ADDED DEBUG
-        video: !!video,
-        usernameInput: !!usernameInput,
-        startCameraBtn: !!startCameraBtn,
-        authenticateBtn: !!authenticateBtn,                    // ✅ VERIFY IT EXISTS
-        currentEmotionDiv: !!currentEmotionDiv,
-        messageDiv: !!messageDiv
-    });
+    //     console.log('DOM elements loaded:', {                      // ✅ ADDED DEBUG
+    //     video: !!video,
+    //     usernameInput: !!usernameInput,
+    //     startCameraBtn: !!startCameraBtn,
+    //     authenticateBtn: !!authenticateBtn,                    // ✅ VERIFY IT EXISTS
+    //     currentEmotionDiv: !!currentEmotionDiv,
+    //     messageDiv: !!messageDiv
+    // });
 
 
         // Emotion badge selection
@@ -274,7 +274,7 @@
                 
                 if (video.videoWidth > 0 && video.videoHeight > 0) {
                     videoReady = true;
-                    authenticateBtn.disabled = false;
+                    authenticationBtn.disabled = false;
                     startCameraBtn.textContent = 'Camera Active ✓';
                     showMessage('Camera started! Make your expression and authenticate', 'success');
                     
@@ -352,7 +352,7 @@
         }
 
         // Authenticate
-        authenticateBtn.addEventListener('click', async function() {
+        authenticationBtn.addEventListener('click', async function() {
             console.log('Authenticate clicked');
             const username = usernameInput.value.trim();
 
@@ -372,8 +372,8 @@
             }
 
             try {
-                authenticateBtn.disabled = true;
-                authenticateBtn.textContent = 'Authenticating...';
+                authenticationBtn.disabled = true;
+                authenticationBtn.textContent = 'Authenticating...';
                 
                 console.log('Capturing image for authentication...');
                 console.log('Required emotion:', selectedEmotion);
@@ -418,14 +418,14 @@
                     }, 1500);
                 } else {
                     showMessage('✗ ' + result.message, 'error');
-                    authenticateBtn.disabled = false;
-                    authenticateBtn.textContent = 'Authenticate';
+                    authenticationBtn.disabled = false;
+                    authenticationBtn.textContent = 'Authenticate';
                 }
             } catch (error) {
                 console.error('Authentication error:', error);
                 showMessage('Authentication error: ' + error.message, 'error');
-                authenticateBtn.disabled = false;
-                authenticateBtn.textContent = 'Authenticate';
+                authenticationBtn.disabled = false;
+                authenticationBtn.textContent = 'Authenticate';
             }
         });
 
