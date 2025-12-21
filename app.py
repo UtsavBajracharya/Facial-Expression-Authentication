@@ -165,6 +165,11 @@ def index():
         return redirect(url_for('dashboard'))
     return render_template('index.html')
 
+# Dashboard 
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
 # Registration page
 @app.route('/register')
 def register():
