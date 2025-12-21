@@ -5,11 +5,503 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <style>
+
+                * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header Section */
+        .header {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .welcome {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .welcome h1 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+
+        .welcome p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e1e1e1;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d1d1;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Card Styling */
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card-icon {
+            font-size: 32px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .card-content {
+            color: #666;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Info List */
+        .info-list {
+            list-style: none;
+        }
+
+        .info-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .info-value {
+            color: #333;
+        }
+
+        /* Action Buttons */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .action-btn {
+            background: #f8f9fa;
+            border: 2px solid #e1e1e1;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .action-btn-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .action-btn-text {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Success Message */
+        .success-banner {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .success-icon {
+            font-size: 40px;
+        }
+
+        .success-text h3 {
+            margin-bottom: 5px;
+        }
+
+        .success-text p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
   
     </style>
 </head>
 <body>
-    <h1>This is dashboard</h1>
+    <div class="container">
+        <!-- Success Banner -->
+        <div class="success-banner">
+            <div class="success-icon">🎉</div>
+            <div class="success-text">
+                <h3>Authentication Successful!</h3>
+                <p>You've successfully logged in using facial recognition</p>
+            </div>
+        </div>
+
+        <!-- Header Section -->
+        <div class="header">
+            <div class="user-info">
+                <div class="user-avatar">{{ username[0].upper() }}</div>
+                <div class="welcome">
+                    <h1>Welcome back, {{ username }}! 👋</h1>
+                    <p>Last login: Just now</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="/logout" class="btn btn-danger">🚪 Sign Out</a>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">1</div>
+                <div class="stat-label">Total Logins</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">100%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Failed Attempts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">New</div>
+                <div class="stat-label">Account Status</div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            <!-- Profile Information Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">👤</div>
+                    <h2 class="card-title">Profile Information</h2>
+                </div>
+                <div class="card-content">
+                    <ul class="info-list">
+                        <li class="info-item">
+                            <span class="info-label">Username:</span>
+                            <span class="info-value">{{ username }}</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Email:</span>
+                            <span class="info-value">user@email.com</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Registered:</span>
+                            <span class="info-value">Today</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Status:</span>
+                            <span class="info-value">✓ Active</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Security Overview Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🔒</div>
+                    <h2 class="card-title">Security Overview</h2>
+                </div>
+                <div class="card-content">
+                    <ul class="info-list">
+                        <li class="info-item">
+                            <span class="info-label">Face Registered:</span>
+                            <span class="info-value">✓ Yes</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Default Emotion:</span>
+                            <span class="info-value">😊 Happy</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">2FA Enabled:</span>
+                            <span class="info-value">✗ No</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-label">Last Updated:</span>
+                            <span class="info-value">Today</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">⚡</div>
+                <h2 class="card-title">Quick Actions</h2>
+            </div>
+            <div class="card-content">
+                <div class="action-grid">
+                    <div class="action-btn" onclick="showSection('update-profile')">
+                        <div class="action-btn-icon">✏️</div>
+                        <div class="action-btn-text">Update Profile</div>
+                    </div>
+                    <div class="action-btn" onclick="showSection('change-email')">
+                        <div class="action-btn-icon">📧</div>
+                        <div class="action-btn-text">Change Email</div>
+                    </div>
+                    <div class="action-btn" onclick="showSection('reregister-face')">
+                        <div class="action-btn-icon">📸</div>
+                        <div class="action-btn-text">Re-register Face</div>
+                    </div>
+                    <div class="action-btn" onclick="showSection('login-history')">
+                        <div class="action-btn-icon">📊</div>
+                        <div class="action-btn-text">Login History</div>
+                    </div>
+                    <div class="action-btn" onclick="showSection('security-settings')">
+                        <div class="action-btn-icon">🛡️</div>
+                        <div class="action-btn-text">Security Settings</div>
+                    </div>
+                    <div class="action-btn" onclick="confirmDelete()">
+                        <div class="action-btn-icon">🗑️</div>
+                        <div class="action-btn-text">Delete Account</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">⚠️ Delete Account</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+                <p><strong>All your data including facial recognition data will be permanently deleted.</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="deleteAccount()">Delete Account</button>
+            </div>
+        </div>
+    </div>
 
 
     <script>

@@ -151,6 +151,15 @@ def save_user_info(username, email):
     }
     with open(user_file, 'w') as f:
         json.dump(user_info, f)
+
+
+def get_user_info(username):
+    """Get user information"""
+    user_file = os.path.join(USER_DATA_DIR, username, 'info.json')
+    if os.path.exists(user_file):
+        with open(user_file, 'r') as f:
+            return json.load(f)
+    return None
     
 
 # Validate if the user already exists 
@@ -168,7 +177,18 @@ def index():
 # Dashboard 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+    """Protected dashboard page"""
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    
+    username = session['username']
+    
+    # Load user info
+    user_info = get_user_info(username)
+    
+    return render_template('dashboard.html', 
+                         username=username,
+                         user_info=user_info)
 
 # Registration page
 @app.route('/register')
