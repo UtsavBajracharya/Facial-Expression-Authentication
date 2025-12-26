@@ -366,7 +366,7 @@
                 </div>
             </div>
             <div class="header-actions">
-                <a href="/logout" class="btn btn-danger">🚪 Sign Out</a>
+                <button class="btn btn-danger" onclick="signOut()">🚪 Sign Out</button>
             </div>
         </div>
 
@@ -505,6 +505,28 @@
 
 
     <script>
+        
+        // Sign Out Function
+        function signOut() {
+            // Show sign out modal
+            document.getElementById('signOutModal').classList.add('active');
+        }
+
+        function confirmSignOut() {
+            // Close modal
+            closeModal('signOutModal');
+            
+            // Show loading message
+            const signOutModal = document.getElementById('signOutModal');
+            const modalContent = signOutModal.querySelector('.modal-body');
+            modalContent.innerHTML = '<p style="text-align: center;">Signing out... 👋</p>';
+            signOutModal.classList.add('active');
+            
+            // Redirect after short delay
+            setTimeout(() => {
+                window.location.href = '/logout';
+            }, 800);
+        }
 
     </script>
     
