@@ -190,6 +190,16 @@ def dashboard():
                          username=username,
                          user_info=user_info)
 
+
+@app.route('/logout')
+def logout():
+    username = session.get('username', 'User')
+    session.pop('username', None)
+    session.clear() 
+    print(f"[INFO] User {username} signed out successfully!")
+    return redirect(url_for('index', signedout='true'))
+
+
 # Registration page
 @app.route('/register')
 def register():
