@@ -34,7 +34,7 @@ A modern, passwordless authentication system that uses **facial recognition** an
 
 ### **Step 1: Clone Repository**
 ```bash
-git clone https://github.com/yourusername/facial-expression-auth.git
+git clone https://github.com/UtsavBajracharya/Facial-Expression-Authentication.git
 cd facial-expression-auth
 ```
 
