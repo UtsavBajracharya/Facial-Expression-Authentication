@@ -1,2 +1,2 @@
 facial_auth_env
-user_data
+echo "user_data/" >> .gitignore   
