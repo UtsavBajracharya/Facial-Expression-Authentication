@@ -4,7 +4,17 @@ import numpy as np
 import base64
 import os
 import json
-from deepface import DeepFace
+import importlib
+try:
+    # Load the optional dependency dynamically so the app can start when
+    # DeepFace is not installed (and static analyzers do not require it).
+    DeepFace = importlib.import_module('deepface').DeepFace
+    DEEPFACE_IMPORT_ERROR = None
+except ImportError as error:
+    # Keep the web app usable even when the optional facial-analysis package
+    # is not installed; endpoints will report the dependency problem clearly.
+    DeepFace = None
+    DEEPFACE_IMPORT_ERROR = error
 from datetime import datetime
 import secrets
 
@@ -80,6 +90,11 @@ def decode_base64_image(base64_string):
 
 def detect_emotion(image):
     try:
+        if DeepFace is None:
+            raise RuntimeError(
+                'DeepFace is not installed. Install it with: pip install deepface'
+            ) from DEEPFACE_IMPORT_ERROR
+
         result = DeepFace.analyze(image, actions=['emotion'], enforce_detection=False)
 
         # Hangle both list and dict results
@@ -127,6 +142,11 @@ def verify_face(username, image):
         return False
     
     try:
+        if DeepFace is None:
+            raise RuntimeError(
+                'DeepFace is not installed. Install it with: pip install deepface'
+            ) from DEEPFACE_IMPORT_ERROR
+
         # Save temporary image
         temp_path = os.path.join(user_dir, 'temp_verify.jpg')
         cv2.imwrite(temp_path, image)
